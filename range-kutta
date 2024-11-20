@@ -1,0 +1,35 @@
+#include <stdio.h>
+
+double f(double x, double y) {
+    return x + y; // Example: dy/dx = x + y
+}
+
+int main() {
+    double x0, y0, h, xn, yn, k1, k2, k3, k4;
+    int n, i;
+
+    printf("Enter initial conditions x0, y0: ");
+    scanf("%lf %lf", &x0, &y0);
+
+    printf("Enter step size (h): ");
+    scanf("%lf", &h);
+
+    printf("Enter number of steps (n): ");
+    scanf("%d", &n);
+
+    xn = x0;
+    yn = y0;
+
+    for (i = 1; i <= n; i++) {
+        k1 = h * f(xn, yn);
+        k2 = h * f(xn + h / 2, yn + k1 / 2);
+        k3 = h * f(xn + h / 2, yn + k2 / 2);
+        k4 = h * f(xn + h, yn + k3);
+
+        yn = yn + (k1 + 2 * k2 + 2 * k3 + k4) / 6;
+        xn = xn + h;
+    }
+
+    printf("Approximated solution at x = %.2f is y = %.6f\n", xn, yn);
+    return 0;
+}

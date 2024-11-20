@@ -1,0 +1,51 @@
+#include <stdio.h>
+
+#define MAX 10
+
+void gauss_jordan(float a[MAX][MAX], float b[MAX], int n) {
+    int i, j, k;
+    float ratio;
+    
+    for (i = 0; i < n; i++) {
+        if (a[i][i] == 0.0) {
+            printf("Divide by zero detected.\n");
+            return;
+        }
+        for (j = 0; j < n; j++) {
+            if (i != j) {
+                ratio = a[j][i] / a[i][i];
+                for (k = 0; k < n; k++) {
+                    a[j][k] = a[j][k] - ratio * a[i][k];
+                }
+                b[j] = b[j] - ratio * b[i];
+            }
+        }
+    }
+    for (i = 0; i < n; i++) {
+        b[i] = b[i] / a[i][i];
+    }
+}
+
+int main() {
+    int n, i, j;
+    float a[MAX][MAX], b[MAX];
+
+    printf("Enter the number of variables: ");
+    scanf("%d", &n);
+     printf("Enter the augmented matrix (a[i][j] and b[i]):\n");
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            scanf("%f", &a[i][j]);
+        }
+        scanf("%f", &b[i]);
+    }
+
+    gauss_jordan(a, b, n);
+
+    printf("The solution is:\n");
+    for (i = 0; i < n; i++) {
+        printf("x%d = %.6f\n", i+1, b[i]);
+    }
+
+    return 0;
+}
