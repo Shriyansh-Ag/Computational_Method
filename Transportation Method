@@ -1,0 +1,86 @@
+clc;
+clear;
+
+disp("=== STEP 1: North-West Corner Method ===");
+
+cost = [2 3 1;
+        5 4 8;
+        5 6 8];
+
+supply = [30; 40; 30];
+demand = [20; 50; 30];
+
+alloc = zeros(3,3); // Allocation matrix
+
+i = 1; j = 1;
+
+while i <= 3 & j <= 3
+    if supply(i) < demand(j) then
+        alloc(i,j) = supply(i);
+        demand(j) = demand(j) - supply(i);
+        supply(i) = 0;
+        i = i + 1;
+    else
+        alloc(i,j) = demand(j);
+        supply(i) = supply(i) - demand(j);
+        demand(j) = 0;
+        j = j + 1;
+    end
+end
+
+disp("Initial Allocation Matrix (North-West Corner Rule):");
+disp(alloc);
+
+total_cost = sum(sum(alloc .* cost));
+disp("Initial Total Transportation Cost:");
+disp(total_cost);
+
+// Step 2: MODI Method - Compute u and v
+disp("=== STEP 2: MODI Method ===");
+
+u = zeros(3,1); u(:) = %nan;
+v = zeros(1,3); v(:) = %nan;
+
+// Pick a row with max allocations (say row 1), assign u(1)=0
+u(1) = 0;
+
+// Fill u and v where allocations exist
+for k = 1:10 // run enough iterations to fill all
+    for i = 1:3
+        for j = 1:3
+            if alloc(i,j) > 0 then
+                if ~isnan(u(i)) & isnan(v(j)) then
+                    v(j) = cost(i,j) - u(i);
+                elseif isnan(u(i)) & ~isnan(v(j)) then
+                    u(i) = cost(i,j) - v(j);
+                end
+            end
+        end
+    end
+end
+
+// Compute opportunity cost Δ[i,j] for unallocated cells
+delta = zeros(3,3);
+for i = 1:3
+    for j = 1:3
+        if alloc(i,j) == 0 then
+            delta(i,j) = cost(i,j) - (u(i) + v(j));
+        else
+            delta(i,j) = 0; // Skip allocated cells
+        end
+    end
+end
+
+disp("u values:");
+disp(u);
+disp("v values:");
+disp(v);
+disp("Opportunity cost matrix (Δ):");
+disp(delta);
+
+// Check for optimality
+if all(delta >= 0) then
+    disp("The current solution is optimal.");
+else
+    disp("The current solution is NOT optimal. Improvement needed.");
+end
