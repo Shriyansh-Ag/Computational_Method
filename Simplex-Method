@@ -1,0 +1,51 @@
+clc;
+clear;
+
+p = input("Enter number of variables in the objective function: ");
+q = input("Enter number of constraint equations: ");
+
+disp("Enter coefficients of the objective function:");
+obj = zeros(1, p);
+for i = 1:p
+    obj(i) = input("Coefficient of x" + string(i) + ": ");
+end
+
+n = input("Enter 1 to Minimize or 2 to Maximize: ");
+if n == 2 then
+    obj = -obj; // For maximization, convert to minimization
+end
+
+// Constraint coefficients, RHS, and signs
+A = zeros(q, p);
+b = zeros(q, 1);
+signs = zeros(q, 1);
+
+disp("Enter constraint equations:");
+
+for i = 1:q
+    disp("Enter coefficients for constraint " + string(i) + ":");
+    for j = 1:p
+        A(i,j) = input("Coefficient of x" + string(j) + ": ");
+    end
+    
+    signs(i) = input("Enter 1 for <= or 2 for >=: ");
+    b(i) = input("Enter constant on RHS: ");
+end
+
+// Add slack/surplus variables
+slack = zeros(q, q);
+for i = 1:q
+    if signs(i) == 1 then
+        slack(i,i) = 1; // Slack variable
+    elseif signs(i) == 2 then
+        slack(i,i) = -1; // Surplus variable
+    end
+end
+
+// Final Tableau
+Z = [obj, zeros(1, q), 0]; // Objective row (add zeros for slack + RHS)
+SimplexTable = [A, slack, b;
+                Z];
+
+disp("=== Initial Simplex Tableau ===");
+disp(SimplexTable);
